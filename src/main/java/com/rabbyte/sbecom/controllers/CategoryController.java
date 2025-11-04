@@ -1,7 +1,9 @@
 package com.rabbyte.sbecom.controllers;
 
+import com.rabbyte.sbecom.dtos.CategoryResponse;
 import com.rabbyte.sbecom.entities.Category;
 import com.rabbyte.sbecom.services.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +21,19 @@ public class CategoryController {
     }
 
     @GetMapping("/api/public/categories")
-    public ResponseEntity<List<Category>> getAllCategories() {
-        List<Category> categories = this.categoryService.getAllCategories();
+    public ResponseEntity<CategoryResponse> getAllCategories() {
+        CategoryResponse categories = this.categoryService.getAllCategories();
         return ResponseEntity.status(HttpStatus.OK).body(categories);
     }
 
+    @GetMapping("/api/public/categories/{id}")
+    public ResponseEntity<Category> getCategory(@PathVariable Long id) {
+        Category category = this.categoryService.getCategoryById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(category);
+    }
+
     @PostMapping("/api/public/categories")
-    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
+    public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category) {
         var resCategory = this.categoryService.createCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(resCategory);
     }
@@ -33,23 +41,15 @@ public class CategoryController {
     @PutMapping("/api/public/categories/{categoryId}")
     public ResponseEntity<Category> updateCategory(
             @PathVariable("categoryId") Long categoryId,
-            @RequestBody Category category
+            @Valid @RequestBody Category category
     ) {
-        try {
-            Category resCategory = this.categoryService.updateCategory(categoryId, category);
-            return new ResponseEntity<>(resCategory, HttpStatus.OK);
-        } catch (ResponseStatusException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        }
+        Category resCategory = this.categoryService.updateCategory(categoryId, category);
+        return new ResponseEntity<>(resCategory, HttpStatus.OK);
     }
 
     @DeleteMapping("api/admin/categories/{categoryId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
-        try {
-            this.categoryService.deleteCategory(categoryId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (ResponseStatusException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        }
+        this.categoryService.deleteCategory(categoryId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
