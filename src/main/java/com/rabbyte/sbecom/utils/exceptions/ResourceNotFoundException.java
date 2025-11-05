@@ -1,13 +1,15 @@
 package com.rabbyte.sbecom.utils.exceptions;
 
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
 public class ResourceNotFoundException extends RuntimeException {
     String resourceName;
     String field;
     String fieldName;
     Long fieldId;
+
+    public ResourceNotFoundException(String resourceName) {
+        super(String.format("%s not found", resourceName));
+        this.resourceName = resourceName;
+    }
 
     public ResourceNotFoundException(String resourceName, String fieldName, String field) {
         super(String.format("%s not found with %s : '%s'", resourceName, field, fieldName));
