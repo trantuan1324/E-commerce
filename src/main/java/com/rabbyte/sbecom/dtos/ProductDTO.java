@@ -1,19 +1,13 @@
-package com.rabbyte.sbecom.entities;
+package com.rabbyte.sbecom.dtos;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "products")
-@Table(name = "products")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Product {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@AllArgsConstructor
+public class ProductDTO {
     private Long productId;
     private String productName;
     private String image;
@@ -22,9 +16,4 @@ public class Product {
     private double price;
     private double discount;
     private double specialPrice;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category categoryId;
-
 }
