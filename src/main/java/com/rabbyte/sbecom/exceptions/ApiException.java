@@ -1,4 +1,4 @@
-package com.rabbyte.sbecom.utils.exceptions;
+package com.rabbyte.sbecom.exceptions;
 
 import lombok.NoArgsConstructor;
 

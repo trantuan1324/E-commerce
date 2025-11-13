@@ -1,4 +1,4 @@
-package com.rabbyte.sbecom.utils.exceptions;
+package com.rabbyte.sbecom.exceptions;
 
 import com.rabbyte.sbecom.dtos.ApiResponse;
 import org.springframework.http.HttpStatus;

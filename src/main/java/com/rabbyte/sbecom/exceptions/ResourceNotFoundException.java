@@ -1,4 +1,4 @@
-package com.rabbyte.sbecom.utils.exceptions;
+package com.rabbyte.sbecom.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
     String resourceName;

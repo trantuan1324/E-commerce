@@ -4,8 +4,8 @@ import com.rabbyte.sbecom.dtos.CategoryDTO;
 import com.rabbyte.sbecom.dtos.CategoryResponse;
 import com.rabbyte.sbecom.entities.Category;
 import com.rabbyte.sbecom.repositories.CategoryRepository;
-import com.rabbyte.sbecom.utils.exceptions.ApiException;
-import com.rabbyte.sbecom.utils.exceptions.ResourceNotFoundException;
+import com.rabbyte.sbecom.exceptions.ApiException;
+import com.rabbyte.sbecom.exceptions.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+    public CategoryResponse handleGetAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
 
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService{
 
         List<Category> categories = categoriesPage.getContent();
         if (categories.isEmpty()) {
-            throw new ResourceNotFoundException("categories");
+            throw new ApiException("categories not found");
         }
 
         List<CategoryDTO> categoryDTOS = categories.stream().map(category ->
@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryDTO createCategory(CategoryDTO reqCategory) {
+    public CategoryDTO handleCreateCategory(CategoryDTO reqCategory) {
         boolean isCategoryExist = this.categoryRepository.existsCategoryByCategoryName(reqCategory.getCategoryName());
         if (isCategoryExist) {
             throw new ApiException("Category already exist!!!");
@@ -66,14 +66,14 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public void deleteCategory(Long categoryId) {
-        Category findingResult = this.getCategoryById(categoryId);
+    public void handleDeleteCategory(Long categoryId) {
+        Category findingResult = this.handleGetCategoryById(categoryId);
         this.categoryRepository.delete(findingResult);
     }
 
     @Override
-    public CategoryDTO updateCategory(Long id, CategoryDTO reqCategory) {
-        Category findingResult = this.getCategoryById(id);
+    public CategoryDTO handleUpdateCategory(Long id, CategoryDTO reqCategory) {
+        Category findingResult = this.handleGetCategoryById(id);
         boolean isCategoryExist = this.categoryRepository.existsCategoryByCategoryName(reqCategory.getCategoryName());
         if (isCategoryExist) {
             throw new ApiException("Category already exist!!!");
@@ -84,7 +84,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public Category getCategoryById(Long categoryId) {
+    public Category handleGetCategoryById(Long categoryId) {
         return this.categoryRepository.findById(categoryId).orElseThrow(
                 () -> new ResourceNotFoundException("category", "categoryId", categoryId)
         );
