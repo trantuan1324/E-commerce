@@ -1,11 +1,10 @@
 package com.rabbyte.sbecom.services;
 
-import com.rabbyte.sbecom.dtos.ProductDTO;
-import com.rabbyte.sbecom.dtos.ProductResponse;
+import com.rabbyte.sbecom.dtos.ProductRequestDTO;
+import com.rabbyte.sbecom.dtos.ProductResponseDTO;
 import com.rabbyte.sbecom.entities.Category;
 import com.rabbyte.sbecom.entities.Product;
 import com.rabbyte.sbecom.exceptions.ApiException;
-import com.rabbyte.sbecom.repositories.CategoryRepository;
 import com.rabbyte.sbecom.repositories.ProductRepository;
 import com.rabbyte.sbecom.exceptions.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -18,13 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -46,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO handleCreateProduct(ProductDTO requestProduct, Long categoryId) {
+    public ProductRequestDTO handleCreateProduct(ProductRequestDTO requestProduct, Long categoryId) {
         Category category = this.categoryService.handleGetCategoryById(categoryId);
 
         if (this.productRepository.existsProductByProductName(requestProduct.getProductName())) {
@@ -62,11 +56,11 @@ public class ProductServiceImpl implements ProductService {
         requestProduct.setSpecialPrice(specialPrice);
 
         Product savedProduct = this.productRepository.save(product);
-        return modelMapper.map(savedProduct, ProductDTO.class);
+        return modelMapper.map(savedProduct, ProductRequestDTO.class);
     }
 
     @Override
-    public ProductResponse handleGetAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+    public ProductResponseDTO handleGetAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
 
@@ -77,23 +71,23 @@ public class ProductServiceImpl implements ProductService {
             throw new ApiException("No products found");
         }
 
-        ProductResponse productResponse = new ProductResponse();
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
 
         List<Product> products = productsPage.getContent();
 
-        List<ProductDTO> productDTOs = modelMapper.map(products, new TypeToken<List<ProductDTO>>(){}.getType());
-        productResponse.setContent(productDTOs);
-        productResponse.setPageNumber(productsPage.getNumber() + 1);
-        productResponse.setPageSize(productsPage.getSize());
-        productResponse.setTotalPages(productsPage.getTotalPages());
-        productResponse.setTotalElements(productsPage.getTotalElements());
-        productResponse.setLastPage(productsPage.isLast());
+        List<ProductRequestDTO> productRequestDTOS = modelMapper.map(products, new TypeToken<List<ProductRequestDTO>>(){}.getType());
+        productResponseDTO.setContent(productRequestDTOS);
+        productResponseDTO.setPageNumber(productsPage.getNumber() + 1);
+        productResponseDTO.setPageSize(productsPage.getSize());
+        productResponseDTO.setTotalPages(productsPage.getTotalPages());
+        productResponseDTO.setTotalElements(productsPage.getTotalElements());
+        productResponseDTO.setLastPage(productsPage.isLast());
 
-        return productResponse;
+        return productResponseDTO;
     }
 
     @Override
-    public ProductResponse handleGetProductsByCategoryId(
+    public ProductResponseDTO handleGetProductsByCategoryId(
             Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortDir
     ) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
@@ -107,21 +101,21 @@ public class ProductServiceImpl implements ProductService {
         if (products.isEmpty()) {
             throw new ResourceNotFoundException("products");
         }
-        ProductResponse productResponse = new ProductResponse();
-        List<ProductDTO> productDTOs = modelMapper.map(products, new TypeToken<List<ProductDTO>>(){}.getType());
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+        List<ProductRequestDTO> productRequestDTOS = modelMapper.map(products, new TypeToken<List<ProductRequestDTO>>(){}.getType());
 
-        productResponse.setContent(productDTOs);
-        productResponse.setPageNumber(productPage.getNumber() + 1);
-        productResponse.setPageSize(productPage.getSize());
-        productResponse.setTotalPages(productPage.getTotalPages());
-        productResponse.setTotalElements(productPage.getTotalElements());
-        productResponse.setLastPage(productPage.isLast());
+        productResponseDTO.setContent(productRequestDTOS);
+        productResponseDTO.setPageNumber(productPage.getNumber() + 1);
+        productResponseDTO.setPageSize(productPage.getSize());
+        productResponseDTO.setTotalPages(productPage.getTotalPages());
+        productResponseDTO.setTotalElements(productPage.getTotalElements());
+        productResponseDTO.setLastPage(productPage.isLast());
 
-        return productResponse;
+        return productResponseDTO;
     }
 
     @Override
-    public ProductResponse handleGetProductsByKeyword(
+    public ProductResponseDTO handleGetProductsByKeyword(
             String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortDir
     ) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
@@ -132,22 +126,22 @@ public class ProductServiceImpl implements ProductService {
         String formatKeyword = ("%" + keyword + "%").toLowerCase();
         List<Product> products = this.productRepository.findProductsByProductNameIsLikeIgnoreCase(formatKeyword);
 
-        ProductResponse productResponse = new ProductResponse();
-        List<ProductDTO> productDTOs = modelMapper.map(products, new TypeToken<List<ProductDTO>>(){}.getType());
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+        List<ProductRequestDTO> productRequestDTOS = modelMapper.map(products, new TypeToken<List<ProductRequestDTO>>(){}.getType());
 
-        productResponse.setPageNumber(productPage.getNumber() + 1);
-        productResponse.setPageSize(productPage.getSize());
-        productResponse.setTotalPages(productPage.getTotalPages());
-        productResponse.setTotalElements(productPage.getTotalElements());
-        productResponse.setLastPage(productPage.isLast());
+        productResponseDTO.setPageNumber(productPage.getNumber() + 1);
+        productResponseDTO.setPageSize(productPage.getSize());
+        productResponseDTO.setTotalPages(productPage.getTotalPages());
+        productResponseDTO.setTotalElements(productPage.getTotalElements());
+        productResponseDTO.setLastPage(productPage.isLast());
 
-        productResponse.setContent(productDTOs);
+        productResponseDTO.setContent(productRequestDTOS);
 
-        return productResponse;
+        return productResponseDTO;
     }
 
     @Override
-    public ProductDTO handleUpdateProduct(long productId, ProductDTO reqProduct) {
+    public ProductRequestDTO handleUpdateProduct(long productId, ProductRequestDTO reqProduct) {
         Product product = this.productRepository.findById(productId).orElseThrow(() ->
             new ResourceNotFoundException("product", "productId", productId)
         );
@@ -168,27 +162,27 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(reqProduct.getDescription());
 
         Product savedProduct = this.productRepository.save(product);
-        return modelMapper.map(savedProduct, ProductDTO.class);
+        return modelMapper.map(savedProduct, ProductRequestDTO.class);
     }
 
     @Override
-    public ProductDTO handleDeleteProduct(long productId) {
+    public ProductRequestDTO handleDeleteProduct(long productId) {
         Product product = this.productRepository.findById(productId).orElseThrow(() ->
             new ResourceNotFoundException("product", "productId", productId)
         );
         this.productRepository.delete(product);
-        return modelMapper.map(product, ProductDTO.class);
+        return modelMapper.map(product, ProductRequestDTO.class);
     }
 
     @Override
-    public ProductDTO handleUpdateProductImage(long productId, MultipartFile image) throws IOException {
+    public ProductRequestDTO handleUpdateProductImage(long productId, MultipartFile image) throws IOException {
         Product dbResult = this.productRepository.findById(productId).orElseThrow(() ->
             new ResourceNotFoundException("product", "productId", productId)
         );
         String fileName = this.fileService.uploadImage(path, image);
         dbResult.setImage(fileName);
         Product savedProduct = this.productRepository.save(dbResult);
-        return modelMapper.map(savedProduct, ProductDTO.class);
+        return modelMapper.map(savedProduct, ProductRequestDTO.class);
     }
 
 

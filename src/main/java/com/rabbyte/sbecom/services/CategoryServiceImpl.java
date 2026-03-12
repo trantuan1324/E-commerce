@@ -1,7 +1,7 @@
 package com.rabbyte.sbecom.services;
 
-import com.rabbyte.sbecom.dtos.CategoryDTO;
-import com.rabbyte.sbecom.dtos.CategoryResponse;
+import com.rabbyte.sbecom.dtos.CategoryRequestDTO;
+import com.rabbyte.sbecom.dtos.CategoryResponseDTO;
 import com.rabbyte.sbecom.entities.Category;
 import com.rabbyte.sbecom.repositories.CategoryRepository;
 import com.rabbyte.sbecom.exceptions.ApiException;
@@ -27,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryResponse handleGetAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+    public CategoryResponseDTO handleGetAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
 
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
@@ -39,12 +39,12 @@ public class CategoryServiceImpl implements CategoryService{
             throw new ApiException("categories not found");
         }
 
-        List<CategoryDTO> categoryDTOS = categories.stream().map(category ->
-            this.modelMapper.map(category, CategoryDTO.class)
+        List<CategoryRequestDTO> categoryRequestDTOS = categories.stream().map(category ->
+            this.modelMapper.map(category, CategoryRequestDTO.class)
         ).toList();
 
-        CategoryResponse response = new CategoryResponse();
-        response.setContent(categoryDTOS);
+        CategoryResponseDTO response = new CategoryResponseDTO();
+        response.setContent(categoryRequestDTOS);
         response.setPageNumber(categoriesPage.getNumber() + 1);
         response.setPageSize(categoriesPage.getSize());
         response.setTotalPages(categoriesPage.getTotalPages());
@@ -55,14 +55,14 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryDTO handleCreateCategory(CategoryDTO reqCategory) {
+    public CategoryRequestDTO handleCreateCategory(CategoryRequestDTO reqCategory) {
         boolean isCategoryExist = this.categoryRepository.existsCategoryByCategoryName(reqCategory.getCategoryName());
         if (isCategoryExist) {
             throw new ApiException("Category already exist!!!");
         }
         Category category = this.modelMapper.map(reqCategory, Category.class);
         Category savedCategory = this.categoryRepository.save(category);
-        return this.modelMapper.map(savedCategory, CategoryDTO.class);
+        return this.modelMapper.map(savedCategory, CategoryRequestDTO.class);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryDTO handleUpdateCategory(Long id, CategoryDTO reqCategory) {
+    public CategoryRequestDTO handleUpdateCategory(Long id, CategoryRequestDTO reqCategory) {
         Category findingResult = this.handleGetCategoryById(id);
         boolean isCategoryExist = this.categoryRepository.existsCategoryByCategoryName(reqCategory.getCategoryName());
         if (isCategoryExist) {
@@ -80,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService{
         }
         findingResult.setCategoryName(reqCategory.getCategoryName());
         Category savedCategory = this.categoryRepository.save(findingResult);
-        return this.modelMapper.map(savedCategory, CategoryDTO.class);
+        return this.modelMapper.map(savedCategory, CategoryRequestDTO.class);
     }
 
     @Override

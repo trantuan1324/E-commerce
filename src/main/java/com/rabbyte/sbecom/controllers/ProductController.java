@@ -1,7 +1,7 @@
 package com.rabbyte.sbecom.controllers;
 
-import com.rabbyte.sbecom.dtos.ProductDTO;
-import com.rabbyte.sbecom.dtos.ProductResponse;
+import com.rabbyte.sbecom.dtos.ProductRequestDTO;
+import com.rabbyte.sbecom.dtos.ProductResponseDTO;
 import com.rabbyte.sbecom.services.ProductService;
 import com.rabbyte.sbecom.utils.constants.AppConstant;
 import jakarta.validation.Valid;
@@ -22,8 +22,8 @@ public class ProductController {
     }
 
     @PostMapping("/admin/categories/{categoryId}/product")
-    public ResponseEntity<ProductDTO> createProduct(
-            @Valid @RequestBody ProductDTO requestProduct,
+    public ResponseEntity<ProductRequestDTO> createProduct(
+            @Valid @RequestBody ProductRequestDTO requestProduct,
             @PathVariable Long categoryId
     ) {
         var result = this.productService.handleCreateProduct(requestProduct, categoryId);
@@ -31,55 +31,55 @@ public class ProductController {
     }
 
     @GetMapping("/public/products")
-    public ResponseEntity<ProductResponse> getAllProducts(
+    public ResponseEntity<ProductResponseDTO> getAllProducts(
             @RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER, required = false) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstant.PAGE_SIZE, required = false) Integer pageSize,
             @RequestParam(name = "sortBy", defaultValue = AppConstant.SORT_BY_PRODUCT_ID, required = false) String sortBy,
             @RequestParam(name = "sortDir", defaultValue = AppConstant.SORT_DIR, required = false) String sortDir
     ) {
-        ProductResponse productResponse = this.productService.handleGetAllProducts(pageNumber, pageSize, sortBy, sortDir);
-        return ResponseEntity.status(200).body(productResponse);
+        ProductResponseDTO productResponseDTO = this.productService.handleGetAllProducts(pageNumber, pageSize, sortBy, sortDir);
+        return ResponseEntity.status(200).body(productResponseDTO);
     }
 
     @GetMapping("/public/categories/{categoryId}/products")
-    public ResponseEntity<ProductResponse> getProductsByCategoryId(
+    public ResponseEntity<ProductResponseDTO> getProductsByCategoryId(
             @RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER, required = false) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstant.PAGE_SIZE, required = false) Integer pageSize,
             @RequestParam(name = "sortBy", defaultValue = AppConstant.SORT_BY_PRODUCT_ID, required = false) String sortBy,
             @RequestParam(name = "sortDir", defaultValue = AppConstant.SORT_DIR, required = false) String sortDir,
             @PathVariable Long categoryId) {
-        ProductResponse productResponse = this.productService.handleGetProductsByCategoryId(categoryId, pageNumber, pageSize, sortBy, sortDir);
-        return ResponseEntity.status(200).body(productResponse);
+        ProductResponseDTO productResponseDTO = this.productService.handleGetProductsByCategoryId(categoryId, pageNumber, pageSize, sortBy, sortDir);
+        return ResponseEntity.status(200).body(productResponseDTO);
     }
 
     @GetMapping("/public/products/keyword/{keyword}")
-    public ResponseEntity<ProductResponse> getProductsByKeyword(
+    public ResponseEntity<ProductResponseDTO> getProductsByKeyword(
             @RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER, required = false) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstant.PAGE_SIZE, required = false) Integer pageSize,
             @RequestParam(name = "sortBy", defaultValue = AppConstant.SORT_BY_PRODUCT_ID, required = false) String sortBy,
             @RequestParam(name = "sortDir", defaultValue = AppConstant.SORT_DIR, required = false) String sortDir,
             @PathVariable String keyword) {
-        ProductResponse productResponse = this.productService.handleGetProductsByKeyword(keyword, pageNumber, pageSize, sortBy, sortDir);
-        return ResponseEntity.status(200).body(productResponse);
+        ProductResponseDTO productResponseDTO = this.productService.handleGetProductsByKeyword(keyword, pageNumber, pageSize, sortBy, sortDir);
+        return ResponseEntity.status(200).body(productResponseDTO);
     }
 
     @PutMapping("/admin/products/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(
-            @Valid @RequestBody ProductDTO productDTO,
+    public ResponseEntity<ProductRequestDTO> updateProduct(
+            @Valid @RequestBody ProductRequestDTO productRequestDTO,
             @PathVariable Long productId
     ) {
-        ProductDTO result = this.productService.handleUpdateProduct(productId, productDTO);
+        ProductRequestDTO result = this.productService.handleUpdateProduct(productId, productRequestDTO);
         return ResponseEntity.status(200).body(result);
     }
 
     @DeleteMapping("/admin/products/{productId}")
-    public ResponseEntity<ProductDTO> deleteProductById(@PathVariable long productId) {
-        ProductDTO result = this.productService.handleDeleteProduct(productId);
+    public ResponseEntity<ProductRequestDTO> deleteProductById(@PathVariable long productId) {
+        ProductRequestDTO result = this.productService.handleDeleteProduct(productId);
         return ResponseEntity.status(200).body(result);
     }
 
     @PutMapping("/products/{productId}/image")
-    public ResponseEntity<ProductDTO> updateProductImage(
+    public ResponseEntity<ProductRequestDTO> updateProductImage(
             @PathVariable long productId,
             @RequestParam("image") MultipartFile image) throws IOException {
         var updatedProduct = this.productService.handleUpdateProductImage(productId, image);

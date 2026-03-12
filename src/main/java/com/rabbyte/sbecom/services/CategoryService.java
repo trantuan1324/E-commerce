@@ -1,13 +1,13 @@
 package com.rabbyte.sbecom.services;
 
-import com.rabbyte.sbecom.dtos.CategoryDTO;
-import com.rabbyte.sbecom.dtos.CategoryResponse;
+import com.rabbyte.sbecom.dtos.CategoryRequestDTO;
+import com.rabbyte.sbecom.dtos.CategoryResponseDTO;
 import com.rabbyte.sbecom.entities.Category;
 
 public interface CategoryService {
-    CategoryResponse handleGetAllCategories(Integer pageNumber, Integer size, String sortBy, String sortDir);
-    CategoryDTO handleCreateCategory(CategoryDTO reqCategory);
+    CategoryResponseDTO handleGetAllCategories(Integer pageNumber, Integer size, String sortBy, String sortDir);
+    CategoryRequestDTO handleCreateCategory(CategoryRequestDTO reqCategory);
     void handleDeleteCategory(Long categoryId);
-    CategoryDTO handleUpdateCategory(Long id, CategoryDTO category);
+    CategoryRequestDTO handleUpdateCategory(Long id, CategoryRequestDTO category);
     Category handleGetCategoryById(Long categoryId);
 }
